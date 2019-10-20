@@ -3,23 +3,25 @@ layout: default
 ---
 
 <div class="home">
-  {%- if page.title -%}
-    <h1 class="page-heading">{{ page.title }}</h1>
-  {%- endif -%}
-
-  {{ content }}
-
-  <h2>Próximos Eventos</h2>
+  <header class="post-header">
+    <h1 class="post-title">Próximos Eventos</h1>
+  </header>
 
   {% for event in site.events %}
     <article class="event">
+
       <span class="post-meta">{{ event.event_date | date: "%b %-d, %Y" }}</span>
 
-      <h3>
+      <h2>
         <a href="{{ event.url }}">
           {{ event.title }}
         </a>
-      </h3>
+      </h2>
+      {%- if event.image -%}
+        <a href="{{ event.url }}">
+          <img src="/assets/{{ event.image }}" class="img-responsive">
+        </a>
+      {%- endif -%}
 
       <p>{{ event.description | markdownify }}</p>
     </article>

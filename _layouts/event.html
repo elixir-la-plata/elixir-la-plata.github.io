@@ -4,6 +4,10 @@ layout: default
 <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
+    {%- if page.image -%}
+      <img src="/assets/{{ page.image }}" class="img-responsive">
+    {%- endif -%}
+
     <h1 class="post-title p-name" itemprop="name headline">{{ page.title | escape }}</h1>
     <p class="post-meta">
       <time class="dt-published" datetime="{{ page.event_date | date_to_xmlschema }}" itemprop="datePublished">

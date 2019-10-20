@@ -16,8 +16,8 @@
 title: Elixir La Plata
 email: nicanorperera@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
-  Elixir La Plata es un grupo de desarrolladores de software para compartir
-  sobre el lenguaje de programación Elixir, y el framework web Phoenix.
+  Comunidad de Elixir en La Plata. Espacio para compartir experiencias con
+  Erlang, Elixir, LFE, OTP, Phoenix y Nerves.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://elixir-la-plata.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: elixir-la-plata
