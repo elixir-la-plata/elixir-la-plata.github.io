@@ -20,7 +20,7 @@ description: >- # this means to ignore newlines until "baseurl:"
   Erlang, Elixir, LFE, OTP, Phoenix y Nerves.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://elixir-la-plata.github.io" # the base hostname & protocol for your site, e.g. http://example.com
-twitter_username: elixir-la-plata
+facebook_username: elixir.lp
 github_username:  elixir-la-plata
 
 collections:
