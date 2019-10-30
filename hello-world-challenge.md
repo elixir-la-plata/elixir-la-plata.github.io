@@ -3,6 +3,7 @@ layout: page
 title: Hello World Challenge
 permalink: /hello-world-challenge/
 ---
+<img src="/assets/hello-world-exercise-icon.png" class="imsg-responsive">
 
 Programadores/as!
 
@@ -19,6 +20,7 @@ Es por eso que hemos creado un equipo de estudio en **exercism.io**
 Exercism es una plataforma donde podemos resolver problemas, compartir nuestras soluciones y aprender unos de otros.
 
 Nuestro primer desafío consiste en instalar Elixir y hacer andar una aplicación sencilla.
+
 
 Los objetivos son simples:
 - [Unirse a nuestro equipo][join-our-team]
