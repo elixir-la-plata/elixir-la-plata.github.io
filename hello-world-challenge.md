@@ -7,20 +7,21 @@ permalink: /hello-world-challenge/
 
 Programadores/as!
 
-Ya falta poco para [la primera Meetup de Elixir en La Plata][first-meetup].
-
-Y como estamos manija, les proponemos un desafío!
+Les proponemos un desafío!
 
 Sabemos que es difícil arrancar a aprender un lenguaje nuevo.
 
 Es por eso que hemos creado un equipo de estudio en **exercism.io**
 
-[Unanse a nuestro equipo][join-our-team]
+[Unanse a nuestro equipo de exercism][join-our-team]
+
+Y también
+
+[Unanse a nuestro grupo de Telegram](https://t.me/joinchat/P4l0hBYN0MHJpR9Dg5Lh9A)
 
 Exercism es una plataforma donde podemos resolver problemas, compartir nuestras soluciones y aprender unos de otros.
 
 Nuestro primer desafío consiste en instalar Elixir y hacer andar una aplicación sencilla.
-
 
 Los objetivos son simples:
 - [Unirse a nuestro equipo][join-our-team]
