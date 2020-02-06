@@ -3,6 +3,7 @@ layout: workshop
 title:  "Workshop 2: Backend"
 workshop_date:   2020-02-14
 description: "Backend, Ecto, Repo, Query, Schema, Changeset, Relations."
+public: false
 ---
 
 ## Borrador

@@ -3,13 +3,18 @@ layout: default
 ---
 <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
 
-  <strong>Contenidos del curso:</strong>
+  <strong>
+    <a href="/workshop">Contenidos del curso:</a></strong>
   <ul class="workshop-index">
     {% for workshop in site.workshop %}
     <li>
+      {% if workshop.public %}
       <a href="{{ workshop.url }}">
         {{ workshop.title }}
       </a>
+      {% else %}
+      {{ workshop.title }} <span style="font-size:50%; color: #666;">(pronto)</span>
+      {% endif %}
     </li>
     {% endfor %}
   </ul>

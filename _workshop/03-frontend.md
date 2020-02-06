@@ -3,6 +3,7 @@ layout: workshop
 title:  "Workshop 3: Frontend"
 workshop_date:   2020-02-21
 description: "Frontend, Plug, Endpoint, Routes, Controller, Views, Templates, Layouts."
+public: false
 ---
 
 ## Borrador

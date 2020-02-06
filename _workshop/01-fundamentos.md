@@ -3,6 +3,7 @@ layout: workshop
 title:  "Workshop 1: Fundamentos"
 workshop_date:   2020-02-07
 description: "Introducción, Set Up, Creación de Aplicación, Deploy y Generadores."
+public: true
 ---
 
 ## Instalamos ASDF
