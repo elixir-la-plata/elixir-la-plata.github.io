@@ -26,6 +26,8 @@ github_username:  elixir-la-plata
 collections:
   events:
     output: true
+  workshop:
+    output: true
 
 timezone: America/Argentina/Buenos_Aires
 
