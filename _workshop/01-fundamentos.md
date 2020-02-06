@@ -155,6 +155,5 @@ mix phx.gen.html Blog Post posts title:string body:string
 - Mostrar la aplicacion en `localhost:4000/posts`
 - Ruta, controlador, Vistas
 
-
 [before-asdf-install]: https://github.com/asdf-vm/asdf-erlang#before-asdf-install
 [localhost]: "https://127.0.0.1:4000"
