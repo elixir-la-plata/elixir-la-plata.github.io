@@ -5,15 +5,18 @@ workshop_date:   2020-02-14
 description: "Backend, Ecto, Repo, Query, Schema, Changeset, Relations."
 ---
 
-# Borrador / Work in progress.
-Aun en proceso.
+## Borrador
+En proceso.
 
 ## Teoría
-
 * Pipe Operator
 * Strings, Charlist y Binarios
 * Alias, Import, Use
-* Elixir Cards: Enum
+
+## Elixir Flashcards
+* Kernel II
+* Enum I
+* Enum II
 
 ## Ecto
 
