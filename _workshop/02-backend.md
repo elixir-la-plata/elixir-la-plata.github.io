@@ -6,8 +6,7 @@ description: "Backend, Ecto, Repo, Query, Schema, Changeset, Relations."
 public: false
 ---
 
-## Borrador
-En proceso.
+(Work in progress)
 
 ## Teoría
 * Pipe Operator
@@ -25,13 +24,24 @@ En proceso.
 * Ecto Repo
 * Ecto Query (algunos ejemplos) -> Será muy difícil hacer una prueba en iex?
 
-## Migration
+### Creamos migración para Comentarios
 
-* Corremos mix ecto, para ver tareas disponibles.
-* Corremos  mix help ecto.gen.migration para ver documentación de migraciones
-* Corremos  mix ecto.gen.migration add_comments
-* Vemos archivo, agregamos código:
+Vemos tareas disponibles de Ecto:
+```
+mix ecto
+```
 
+Vemos documentación de tarea de generación de migración:
+```
+mix help ecto.gen.migration
+```
+
+Creamos nueva migración
+```
+mix ecto.gen.migration add_comments
+```
+
+Entramos al archivo nuevo y agregamos `body` y `post_id`:
 ``` elixir
 create table(:comments) do
   add :body, :string
@@ -41,25 +51,37 @@ create table(:comments) do
 end
 ```
 
-* Corremos mix ecto.migrate
-
-## Schema
-
+Corremos migración:
 ```
+mix ecto.migrate
+```
+
+### Corremos queries en iex
+
+``` elixir
 import Ecto.Query
-alias Yo.Post
-from p in "posts”, select: p.id
+
+query = from p in "posts", select: p.id
+Repo.all(query)
+
+query = from p in "posts", select: %{id: p.id, title: p.title, body: p.body}
+Repo.all(query)
+
+query = from p in "posts", join: c in "comments", on: c.post_id == p.id, select: [p.id, c.id]
+Repo.all(query)
 ```
 
+Ejemplo con Pipe: (los parentesis son necesarios)
 ```
-from p in "posts", select: %{id: p.id, title: p.title, body: p.body}
+(
+Post
+|> order_by([p], [p.title, p.body])
+|> Repo.all()
+)
 ```
 
-```
-q = from p in “posts”, join: c in "comments", on: c.post_id == p.id, select: [p.id, c.id]
-```
+### Ecto.Schema
 
-## Schema
 ``` elixir
 defmodule Yo.Blog.Post do
   use Ecto.Schema
@@ -73,7 +95,18 @@ defmodule Yo.Blog.Post do
 end
 ```
 
-## Creamos Schema de Comentarios
+Corremos queries usando el schema `Post`:
+``` elixir
+import Ecto.Query
+alias Yo.Blog.Post
+
+Repo.all(Post)
+
+query = from p in Post, where: p.id < 5
+Repo.all(query)
+```
+
+### Creamos Schema de Comentarios
 ``` elixir
 defmodule Yo.Blog.Comment do
   use Ecto.Schema
@@ -93,59 +126,63 @@ Y en post
 has_many :comments, Yo.Blog.Comment
 ```
 
-## Hacemos queries en iex
-```
+## Corremos queries en iex
+``` elixir
 import Ecto.Query
 alias Yo.Repo
 alias Yo.Blog.Post
 alias Yo.Blog.Comment
 
-Repo.all(%Post{})
+Repo.all(Post)
 
-Repo.all(%Comment{})
+Repo.all(Comment)
 
 query = from p in Post, join: c in Comment, on: c.post_id == p.id
-
 Repo.all(query)
 
 query = from [p, c] in query, select: {p.title, c.body}
-
 Repo.all(query)
-
 ```
 
-## .iex.exs
-```
+Creamos archivo `.iex.exs`:
+``` elixir
 import Ecto.Query
 alias Yo.Repo
 alias Yo.Blog.Post
 alias Yo.Blog.Comment
 ```
 
-## Insertamos un Comment sin Post
-```
-Repo.insert(%Comment{body: "Probando"})
-```
-Explicamos que eso está mal.
-
-## Changeset
-
-En Comment
+Insertamos comentario sin post
 ``` elixir
- def changeset(post, attrs) do
-    post
-    |> cast(attrs, [:post_id, :body])
-    |> validate_required([:post_id, :body])
-  end
+Repo.insert(%Comment{body: "Probando"})
+# Ups! Necesitamos validaciones!
 ```
 
-Queremos que los posts tengan titulos unicos.
-Create migration
+### Ecto.Changeset
+
+En `comment.ex` agregamos:
+``` elixir
+def changeset(post, attrs) do
+  post
+  |> cast(attrs, [:post_id, :body])
+  |> validate_required([:post_id, :body])
+end
+```
+
+Probamos insertar otro comentario sin post
+``` elixir
+Repo.insert(%Comment{body: "Otro comentario"})
+# Ahora no me lo permite :)
+```
+
+### Queremos que los posts tengan títulos únicos.
+
+Creamos una nueva migración:
 ```
 mix ecto.gen.migration add_unique_index_to_post_title
 ```
 
-Add unique index to Titulo de Posts
+Agregamos index único al titulo de Posts:
 ``` elixir
 defmodule Yo.Repo.Migrations.AddUniqueIndexToPostTitle do
   use Ecto.Migration
@@ -156,26 +193,29 @@ defmodule Yo.Repo.Migrations.AddUniqueIndexToPostTitle do
 end
 ```
 
-Go to iex and try to insert post twice
+Vamos a iex e intentamos insertar el Post 2 veces
 ```
 changeset = Post.changeset(%Post{},%{title: "a", body: "asa"})
 Repo.insert(changeset)
 Repo.insert(changeset)
 ```
 
-Agregamos unique constraint
+Ahora agregamos una restricción:
 ```
 |> unique_constraint(:title)
 ```
 
-Contexto, modificamos get_post! para que nos traiga los comentarios.
-Preload.
-```
-  def get_post!(id), do: Repo.get!(Post, id) |> Repo.preload([:comments])
+### Contexto
+
+Modificamos `get_post!` para que nos traiga los comentarios.
+``` elixir
+  def get_post!(id) do
+    Repo.get!(Post, id) |> Repo.preload([:comments])
+  end
 ```
 
-Si quiero que venga en una sola query tengo que ser explicito con los joins.
-```
+Si quiero que venga en una sola query tengo que ser explícito con los joins.
+``` elixir
 def get_post(id) do
   Repo.all(
     from p in Post,
@@ -183,6 +223,4 @@ def get_post(id) do
       preload: [comments: c]
   )
 end
-  ```
-
-* Testing
+```

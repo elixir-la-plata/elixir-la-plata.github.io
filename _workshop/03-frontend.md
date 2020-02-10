@@ -47,7 +47,9 @@ Procesos
 Explicar procesos en general
 
 Explicar spawn:
+```
 spawn(fn -> 1 + 2 end)
+```
 
 Explicar vida de un proceso:
 pid = spawn(fn -> 1 + 2 end)
