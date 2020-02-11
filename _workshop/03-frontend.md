@@ -43,35 +43,40 @@ En proceso.
 
 -----
 
-Procesos
-Explicar procesos en general
+## Procesos
 
-Explicar spawn:
-```
+Crear un proceso:
+``` elixir
 spawn(fn -> 1 + 2 end)
 ```
 
-Explicar vida de un proceso:
+Vida de un proceso:
+``` elixir
 pid = spawn(fn -> 1 + 2 end)
 Process.alive?(pid)
 
-Explicar self()
 self()
 Process.alive?(self())
+```
 
-Explicar send y cola de mensajes:
+Cola de mensajes:
+``` elixir
 send self(), {:mensaje, "Hola mundo"}
 send self(), {:otra_cosa, "Como va?"}
 
 Process.info(self(), :messages)
+```
 
-Explicar receive (llamarlo 3 veces, la tercera va a bloquear):
+Llamamos receive 3 veces (la tercera va a bloquear):
+``` elixir
 receive do
   {:mensaje, msg} -> msg
   {:otra_cosa, _msg} -> "No me importa"
 end
+```
 
-Explicar send y receive con ejemplo mas complejo:
+Ejemplo más complejo:
+``` elixir
 send self(), {:mensaje, "Hola mundo"}
 send self(), {:mensaje, "Como va?"}
 send self(), {:otra_cosa, "Como va?"}
@@ -86,34 +91,71 @@ receive do
 end
 
 Process.info(self(), :messages)
+```
 
-Explicar receive con timeout:
+Podemos usar timeout:
+``` elixir
 receive do
   {:mensaje, msg} -> msg
   {:otra_cosa, _msg} -> "No me importa"
 after
   1_000 -> "Pasó 1 segundo"
 end
+```
 
-Explicar spawn_link, EXIT:
+Linkear procesos y EXIT:
+``` elixir
 self()
 spawn_link fn -> raise "oops" end
 self()
+```
 
-
-Explicar brevemente Task:
+### Tareas:
+``` elixir
 Task.start fn -> raise "oops" end
+```
 
-
+Async y await:
+``` elixir
 task = task.async(fn -> 1 + 1 end)
 task = Task.await(task)
+```
 
-Explicar state + KV
-…
+Estado con procesos:
+``` elixir
+defmodule KV do
+  def start_link do
+    Task.start_link(fn -> loop(%{}) end)
+  end
 
-Explicar Agent?
-…
+  defp loop(map) do
+    receive do
+      {:get, key, caller} ->
+        send caller, Map.get(map, key)
+        loop(map)
+      {:put, key, value} ->
+        loop(Map.put(map, key, value))
+    end
+  end
+end
+```
 
+Podemos llamar al proceso:
+``` elixir
+{:ok, pid} = KV.start_link()
+send(pid, {:put, :hello, :world})
+send(pid, {:get, :hello, self()})
+flush()
+```
 
-Plug
-Explicar que es Plug
+### Agentes
+``` elixir
+{:ok, pid} = Agent.start_link(fn -> %{} end)
+Agent.update(pid, fn map -> Map.put(map, :hello, :world) end)
+Agent.get(pid, fn map -> Map.get(map, :hello) end)
+```
+
+## Plug
+```
+
+```
