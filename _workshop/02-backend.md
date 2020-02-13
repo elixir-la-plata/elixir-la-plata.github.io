@@ -11,6 +11,92 @@ public: false
 * Strings, Charlist y Binarios
 * Alias, Import, Use
 
+### Pipeline Operator
+
+#### Bash example
+
+```bash
+ls | grep "Do"
+```
+
+#### Elixir without pipeline
+
+```elixir
+string            = "hello, world!"
+words             = String.split(string, " ")
+capitalized_words = Enum.map(words, &String.capitalize/1)
+Enum.join(capitalized_words, " ")
+```
+
+#### Elixir with pipeline
+
+```elixir
+"hello, world!"
+  |> String.split(" ")
+  |> Enum.map(&String.capitalize/1)
+  |> Enum.join
+```
+
+### String
+
+#### Strings are a sequence of bytes
+
+```elixir
+iex> string = <<104,101,108,108,111>>
+"hello"
+iex> "hello" <> <<0>>
+<<104, 101, 108, 108, 111, 0>>
+```
+
+
+### Charlist
+
+```elixir
+iex> 'hełło'
+[104, 101, 322, 322, 111]
+iex> "hełło" <> <<0>>
+<<104, 101, 197, 130, 197, 130, 111, 0>>
+```
+
+`322` is the Unicode codepoint for ł but it is
+encoded in UTF-8 as the two bytes `197`, `130`.
+
+
+### Code point
+
+You can get a character’s code point by using `?`
+
+```elixir
+iex> ?Z
+90
+```
+
+### Back to strings
+
+```elixir
+iex> string = "\u0061\u0301"
+"á"
+iex> String.codepoints string
+["a", "́"]
+iex> String.graphemes string
+["á"]
+```
+
+
+### Basic functions
+
+```elixir
+iex> String.length "Hello"
+5
+iex> String.replace("Hello", "e", "a")
+"Hallo"
+iex> String.duplicate("Oh my ", 3)
+"Oh my Oh my Oh my "
+iex> String.split("Hello World", " ")
+["Hello", "World"]
+```
+
+
 ## Elixir Flashcards
 * Kernel II
 * Enum I
