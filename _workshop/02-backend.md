@@ -6,8 +6,6 @@ description: "Backend, Ecto, Repo, Query, Schema, Changeset, Relations."
 public: false
 ---
 
-(Work in progress)
-
 ## Teoría
 * Pipe Operator
 * Strings, Charlist y Binarios
@@ -19,10 +17,6 @@ public: false
 * Enum II
 
 ## Ecto
-
-* Ecto Modulos
-* Ecto Repo
-* Ecto Query (algunos ejemplos) -> Será muy difícil hacer una prueba en iex?
 
 ### Creamos migración para Comentarios
 
@@ -74,8 +68,9 @@ Repo.all(query)
 Ejemplo con Pipe: (los parentesis son necesarios)
 ```
 (
-Post
-|> order_by([p], [p.title, p.body])
+"posts"
+|> order_by([:title])
+|> select([:title, :body])
 |> Repo.all()
 )
 ```
@@ -169,9 +164,16 @@ def changeset(post, attrs) do
 end
 ```
 
-Probamos insertar otro comentario sin post
+Probamos insertar otro comentario sin post usando el changeset
 ``` elixir
-Repo.insert(%Comment{body: "Otro comentario"})
+changeset = Comment.changeset(%Comment{}, %{body: "Otro comentario"})
+
+changeset.valid?
+
+changeset.errors
+
+Repo.insert(changeset)
+
 # Ahora no me lo permite :)
 ```
 
@@ -216,9 +218,10 @@ Modificamos `get_post!` para que nos traiga los comentarios.
 
 Si quiero que venga en una sola query tengo que ser explícito con los joins.
 ``` elixir
-def get_post(id) do
-  Repo.all(
+def get_post!(id) do
+  Repo.one!(
     from p in Post,
+      where: p.id == ^id,
       join: c in assoc(p, :comments),
       preload: [comments: c]
   )
