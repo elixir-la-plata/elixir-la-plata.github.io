@@ -259,13 +259,22 @@ cast(post, %{}, [:title, :body])
 cast(post, %{title: "nuevo titulo"}, [:title, :body])
 
 # Con titulo y body
-cast(post, %{title: "nuevo titulo", body: "nuevo body"}, [:title, :body])
+changeset = cast(post, %{title: "nuevo titulo", body: "nuevo body"}, [:title, :body])
+
+changeset.valid?
+
+changeset.errors
+
 
 # Con validación
 (
-  cast(post, %{}, [:title, :body])
+  changeset = cast(post, %{}, [:title, :body])
   |> validate_required([:title, :body])
 )
+
+changeset.valid?
+
+changeset.errors
 
 IO.puts(inspect(cast(post, %{}, [:title, :body]), structs: false, pretty: true))
 ```
@@ -349,5 +358,23 @@ def get_post!(id) do
       left_join: c in assoc(p, :comments),
       preload: [comments: c]
   )
+end
+```
+
+### Corremos tests
+
+```
+mix test
+```
+
+Modificamos test:
+``` elixir
+test "get_post!/1 returns the post with given id" do
+  post = post_fixture()
+  loaded_post = Blog.get_post!(post.id)
+      
+  assert post.title == loaded_post.title
+  assert post.body == loaded_post.body
+  assert loaded_post.body == []
 end
 ```
