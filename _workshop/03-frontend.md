@@ -183,3 +183,55 @@ Agent.get(pid, fn map -> Map.get(map, :hello) end)
 ```
 
 ```
+
+## Endpoint
+
+Los archivos estáticos se sirven de `priv/static`:
+``` elixir
+  plug Plug.Static,
+    at: "/",
+    from: :yo,
+    gzip: false,
+    only: ~w(css fonts images js favicon.ico robots.txt)
+```
+
+`Plug.RequestId` genera un ID único por cada request:
+``` elixir
+  plug Plug.RequestId
+```
+
+`Plug.Telemetry` agrega puntos de instrumentación para que Phoenix pueda loguear el path, status code y tiempo por defecto:
+``` elixir
+  plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
+```
+
+`Plug.Parsers` nos dice como parsear el Request Body:
+``` elixir
+  plug Plug.Parsers,
+    parsers: [:urlencoded, :multipart, :json],
+    pass: ["*/*"],
+    json_decoder: Phoenix.json_library()
+```
+
+[`Plug.MethodOverride`](https://github.com/elixir-plug/plug/blob/v1.9.0/lib/plug/method_override.ex) si recibe un `POST` con el parametro `_method`, lo cambia por ese método (`PUT`, `PATCH` o `DELETE`):
+``` elixir
+  plug Plug.MethodOverride
+```
+
+[`Plug.Head`](https://github.com/elixir-plug/plug/blob/v1.9.0/lib/plug/head.ex) convierte solicitud `HEAD` a solicitud `GET`:
+``` elixir
+  plug Plug.Head
+```
+
+`Plug.Session` maneja las cookies de sesión y las session stores.
+``` elixir  
+  plug Plug.Session,
+    store: :cookie,
+    key: "_yo_key",
+    signing_salt: "KxgXE3ZF"
+```
+
+El último paso es ir al router, que también es un Plug:
+``` elixir
+  plug YoWeb.Router
+```
