@@ -3,7 +3,7 @@ layout: workshop
 title:  "Workshop 2: Backend"
 workshop_date:   2020-02-14
 description: "Backend, Ecto, Repo, Query, Schema, Changeset, Relations."
-public: false
+public: true
 ---
 
 ## Teoría
@@ -207,6 +207,11 @@ Y en post
 has_many :comments, Yo.Blog.Comment
 ```
 
+La macro schema nos define un struct:
+```
+%Post{}
+```
+
 ## Corremos queries en iex
 ``` elixir
 import Ecto.Query
@@ -241,10 +246,34 @@ Repo.insert(%Comment{body: "Probando"})
 
 ### Ecto.Changeset
 
+Vamos a correr uno por vez:
+``` elixir
+import Ecto.Changeset
+
+post = %Post{title: "titulo"}
+
+# Sin nada
+cast(post, %{}, [:title, :body])
+
+# Con titulo
+cast(post, %{title: "nuevo titulo"}, [:title, :body])
+
+# Con titulo y body
+cast(post, %{title: "nuevo titulo", body: "nuevo body"}, [:title, :body])
+
+# Con validación
+(
+  cast(post, %{}, [:title, :body])
+  |> validate_required([:title, :body])
+)
+
+IO.puts(inspect(cast(post, %{}, [:title, :body]), structs: false, pretty: true))
+```
+
 En `comment.ex` agregamos:
 ``` elixir
-def changeset(post, attrs) do
-  post
+def changeset(comment, attrs) do
+  comment
   |> cast(attrs, [:post_id, :body])
   |> validate_required([:post_id, :body])
 end
@@ -261,6 +290,15 @@ changeset.errors
 Repo.insert(changeset)
 
 # Ahora no me lo permite :)
+```
+
+En `post.ex` agregamos:
+``` elixir
+def changeset(post, attrs) do
+  post
+  |> cast(attrs, [:title, :body])
+  |> validate_required([:title, :body])
+end
 ```
 
 ### Queremos que los posts tengan títulos únicos.
@@ -282,14 +320,14 @@ end
 ```
 
 Vamos a iex e intentamos insertar el Post 2 veces
-```
+``` elixir
 changeset = Post.changeset(%Post{},%{title: "a", body: "asa"})
 Repo.insert(changeset)
 Repo.insert(changeset)
 ```
 
 Ahora agregamos una restricción:
-```
+``` elixir
 |> unique_constraint(:title)
 ```
 
@@ -308,7 +346,7 @@ def get_post!(id) do
   Repo.one!(
     from p in Post,
       where: p.id == ^id,
-      join: c in assoc(p, :comments),
+      left_join: c in assoc(p, :comments),
       preload: [comments: c]
   )
 end
