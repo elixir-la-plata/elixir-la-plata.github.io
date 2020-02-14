@@ -19,6 +19,30 @@ En proceso.
 * Enum III
 * Fundamentals III
 
+
+## Antes de empezar
+
+En `post.ex` faltó agregar el *on_delete*:
+```
+has_many :comments, Yo.Blog.Comment, on_delete: :delete_all
+```
+
+Vamos a cambiar los estilos. Clonar projecto:
+```
+git clone https://github.com/nicanor/estilo-yo.git
+```
+Reemplazar contenido de la carpeta `/assets/css/` y `/lib/yo_web/templates/layout/`.
+
+Agregar class table a las tablas:
+```
+<table class="table">
+```
+
+Agregar class button submit-button al botón del formulario:
+```
+  <%= submit "Save", class: "button submit-button" %>
+```
+
 ## Plug
 * Plug
 * Plug.Conn
