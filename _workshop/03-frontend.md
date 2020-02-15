@@ -6,19 +6,14 @@ description: "Frontend, Plug, Endpoint, Routes, Controller, Views, Templates, La
 public: false
 ---
 
-## Borrador
-En proceso.
-
 ## Teoría
 * Procesos, receive, send, PID, self()
 * Tasks
 * Estado y Agent
 
 ## Elixir Cards:
-* Kernel III
-* Enum III
-* Fundamentals III
-
+* Kernel II y III
+* Agent
 
 ## Antes de empezar
 
@@ -40,30 +35,9 @@ Agregar class table a las tablas:
 
 Agregar class button submit-button al botón del formulario:
 ```
-  <%= submit "Save", class: "button submit-button" %>
+<%= submit "Save", class: "button submit-button" %>
 ```
 
-## Plug
-* Plug
-* Plug.Conn
-* Cómo crear un plug (función y módulo)
-* Cómo atravieza Plug toda la aplicación
-
-## Rutas
-* Pipelines
-* Scope
-* Resources
-
-## Controladores y vistas.
-* Comparar con Rails
-* Explicar acción por acción
-
-## Parte práctica:
-* Creamos Post público (index y show) Controladores, Vistas y Templates.
-
-## Si hay tiempo
-* Webpack y Layout - Agregar CSS y poner linda la página.
-* Creamos una API
 
 -----
 
@@ -318,4 +292,91 @@ end
 Agregamos plug a controlador:
 ``` elixir
 plug YoWeb.Plugs.Unauthorized, message: "Desde el controlador"
+```
+
+## Views
+Las vistas se encargan de renderizar los templates.
+``` elixir
+defmodule YoWeb.PostView do
+  use YoWeb, :view
+
+  def render("index.html", _assigns) do
+    "Hola Mundo"
+  end
+end
+```
+
+```
+Phoenix.View.render(YoWeb.PageView, "index.html", %{})
+```
+
+## Templates:
+
+Agregar a `show.html.erb`:
+``` elixir
+<%= "Puedo embeber código Elixir" %>
+```
+
+En `Post.View` agregar:
+``` elixir
+def saludo do
+  "Hola Mundo"
+end
+```
+
+Y en `show.html.erb` agregar:
+``` elixir
+<%= saludo %>
+```
+
+Agregar comentarios en `show.html.erb`:
+``` elixir
+<h2>Comments</h2>
+<ul>
+  <%= for comment <- @post.comments do %>
+    <li><%= comment.body %></li>
+  <% end %>
+</ul>
+```
+
+## API
+Agregamos rutas para api:
+``` elixir
+scope "/api", YoWeb.Api do
+  pipe_through :api
+  resources "/posts", PostController, only: [:show, :index]
+end
+```
+
+Agregamos nuevo controlador `controllers/api/post_controller.ex`:
+``` elixir
+defmodule YoWeb.Api.PostController do
+  use YoWeb, :controller
+  alias Yo.Blog
+
+  def index(conn, _params) do
+    posts = Blog.list_posts()
+    render(conn, "index.json", posts: posts)
+  end
+
+  def show(conn, %{"id" => id}) do
+    post = Blog.get_post!(id)
+    render(conn, "show.json", post: post)
+  end
+end
+```
+
+Agregamos nueva vista `controllers/api/post_controller.ex`:
+``` elixir
+defmodule YoWeb.Api.PostView do
+  use YoWeb, :view
+
+  def render("index.json", %{posts: posts}) do
+    render_many(posts, YoWeb.Api.PostView, "show.json")
+  end
+
+  def render("show.json", %{post: post}) do
+    %{id: post.id, title: post.title, body: :body}
+  end
+end
 ```
