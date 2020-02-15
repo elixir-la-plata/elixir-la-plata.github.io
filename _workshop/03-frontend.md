@@ -179,59 +179,143 @@ Agent.update(pid, fn map -> Map.put(map, :hello, :world) end)
 Agent.get(pid, fn map -> Map.get(map, :hello) end)
 ```
 
-## Plug
+# Plug
+`%Plug.Conn` tiene información del request y el response. Correr en iex:
 ```
-
+%Plug.Conn{}
 ```
 
 ## Endpoint
 
-Los archivos estáticos se sirven de `priv/static`:
+Mirada simplificada del endpoint por defecto:
 ``` elixir
-  plug Plug.Static,
-    at: "/",
-    from: :yo,
-    gzip: false,
-    only: ~w(css fonts images js favicon.ico robots.txt)
-```
+# lib_web/endpoint.ex
+defmodule YoWeb.Endpoint do
+  use Phoenix.Endpoint, otp_app: :yo
 
-`Plug.RequestId` genera un ID único por cada request:
-``` elixir
+  plug Plug.Static, []
   plug Plug.RequestId
-```
-
-`Plug.Telemetry` agrega puntos de instrumentación para que Phoenix pueda loguear el path, status code y tiempo por defecto:
-``` elixir
-  plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
-```
-
-`Plug.Parsers` nos dice como parsear el Request Body:
-``` elixir
-  plug Plug.Parsers,
-    parsers: [:urlencoded, :multipart, :json],
-    pass: ["*/*"],
-    json_decoder: Phoenix.json_library()
-```
-
-[`Plug.MethodOverride`](https://github.com/elixir-plug/plug/blob/v1.9.0/lib/plug/method_override.ex) si recibe un `POST` con el parametro `_method`, lo cambia por ese método (`PUT`, `PATCH` o `DELETE`):
-``` elixir
+  plug Plug.Telemetry, []
+  plug Plug.Parsers, []
   plug Plug.MethodOverride
-```
-
-[`Plug.Head`](https://github.com/elixir-plug/plug/blob/v1.9.0/lib/plug/head.ex) convierte solicitud `HEAD` a solicitud `GET`:
-``` elixir
   plug Plug.Head
-```
-
-`Plug.Session` maneja las cookies de sesión y las session stores.
-``` elixir  
-  plug Plug.Session,
-    store: :cookie,
-    key: "_yo_key",
-    signing_salt: "KxgXE3ZF"
-```
-
-El último paso es ir al router, que también es un Plug:
-``` elixir
+  plug Plug.Session, []
   plug YoWeb.Router
+end
+```
+
+* `Plug.Static` Busca archivos estáticos en `priv/static`.
+* `Plug.RequestId` genera un ID único por cada request.
+* `Plug.Telemetry` agrega puntos de instrumentación para loguear el path, status code y tiempos.
+* `Plug.Parsers` nos dice como parsear el Request Body.
+* [`Plug.MethodOverride`](https://github.com/elixir-plug/plug/blob/v1.9.0/lib/plug/method_override.ex) usa parametro `_method` para cambiar POST por PUT, PATCH o DELETE.
+* [`Plug.Head`](https://github.com/elixir-plug/plug/blob/v1.9.0/lib/plug/head.ex) convierte solicitud `HEAD` a solicitud `GET`.
+* `Plug.Session` maneja las cookies de sesión y las session stores.
+* `YoWeb.Router` es el último paso del endpoint.
+
+## Agregamos un Plug
+``` elixir
+defp unauthorize!(conn, _) do
+  conn
+  |> Plug.Conn.resp(401, "No autorizado!")
+  |> halt()
+end
+
+plug :unauthorize!
+```
+
+También podemos pasarle parametros:
+``` elixir
+defp unauthorize!(conn, options) do
+  message = options[:message] || "No autorizado!"
+
+  conn
+  |> Plug.Conn.resp(401, message)
+  |> halt()
+end
+
+plug :unauthorize!, message: "Paso mensaje por parámetro"
+```
+
+Y podemos escribirlo como módulo. Creamos la carpeta `lib_web/plugs/` y agregamos el archivo `unauthorized.ex`:
+``` elixir
+defmodule YoWeb.Plugs.Unauthorized do
+  import Plug.Conn
+
+  def init(default), do: default
+
+  def call(conn, options) do
+    message = options[:message] || "No autorizado"
+
+    conn
+    |> Plug.Conn.resp(401, message)
+    |> halt()
+  end
+end
+```
+
+Y lo llamamos desde el endpoint:
+``` elixir
+plug YoWeb.Plugs.Unauthorized, message: "Ahora uso un Módulo"
+```
+
+## Rutas
+
+La linea `resources "/posts", PostController` equivale a:
+``` elixir
+get "/posts", PostController, :index
+get "/posts/:id/edit", PostController, :edit
+get "/posts/new", PostController, :new
+get "/posts/:id", PostController, :show
+post "/posts", PostController, :create
+put "/posts/:id", PostController, :update
+patch "/posts/:id", PostController, :update
+delete "/posts/:id", PostController, :delete
+```
+
+Corremos `mix phx.routes`:
+```
+mix phx.routes
+```
+
+Se pueden nestear resources:
+``` elixir
+resources "/posts", PostController do
+  resources "/comments", CommentController
+end
+```
+
+Plugs del router:
+* `plug :accepts` define el formato de solicitud aceptado.
+* `plug :fetch_session` carga `conn` con los datos de sesión.
+* `plug :fetch_flash` carga `conn` con mensajes flash seteados.
+* `plug :protect_from_forgery` protege de cross site forgery.
+* `plug :put_secure_browser_headers` también protege de cross site forgery.
+
+## Controladores
+
+En Rails:
+``` ruby
+class PostsController < ApplicationController
+  def show @post = Post.find(params[:id])
+    # render "show.html"
+  end
+end
+```
+
+En Phoenix:
+``` elixir
+defmodule YoWeb.PostController do
+  use YoWeb, :controller
+
+  def show(conn, %{"id" => id}) do
+    post = Blog.get_post!(id)
+    render(conn, "show.html", post: post)
+  end
+end
+```
+
+Agregamos plug a controlador:
+``` elixir
+plug YoWeb.Plugs.Unauthorized, message: "Desde el controlador"
 ```
