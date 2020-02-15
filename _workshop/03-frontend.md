@@ -38,7 +38,6 @@ Agregar class button submit-button al botón del formulario:
 <%= submit "Save", class: "button submit-button" %>
 ```
 
-
 -----
 
 ## Procesos
@@ -342,7 +341,7 @@ Agregar comentarios en `show.html.erb`:
 ## API
 Agregamos rutas para api:
 ``` elixir
-scope "/api", YoWeb.Api do
+scope "/api", YoWeb.Api, as: :api do
   pipe_through :api
   resources "/posts", PostController, only: [:show, :index]
 end

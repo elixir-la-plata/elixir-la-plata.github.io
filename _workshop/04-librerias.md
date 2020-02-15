@@ -1,7 +1,7 @@
 ---
 layout: workshop
 title:  "Workshop 4: Librerias"
-workshop_date:   2020-02-21
+workshop_date:   2020-02-28
 description: "Manejo de dependencias, Autenticación, terminando aplicación, releases."
 public: false
 ---
@@ -19,6 +19,10 @@ En proceso.
 Agregamos dependencia
 Hacemos modelo Usuario.
 Pensar más.
+
+## Soportar Markdown
+Agregamos dependencia
+Hacemos que el body se muestre con markdown.
 
 
 ## Mover todo a Admin
