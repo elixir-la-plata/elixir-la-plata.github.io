@@ -280,6 +280,15 @@ resources "/posts", PostController do
 end
 ```
 
+Corremos `mix phx.routes` y testeamos las nuevas rutas con `iex -S mix`:
+```
+alias YoWeb.Router.Helpers, as: Routes
+
+Routes.post_comment_path(YoWeb.Endpoint, :index, 1)
+
+Routes.post_comment_path(YoWeb.Endpoint, :edit, 1, 2)
+```
+
 Plugs del router:
 * `plug :accepts` define el formato de solicitud aceptado.
 * `plug :fetch_session` carga `conn` con los datos de sesión.
