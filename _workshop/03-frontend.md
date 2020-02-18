@@ -251,6 +251,28 @@ Corremos `mix phx.routes`:
 mix phx.routes
 ```
 
+Cuando definimos rutas, automaticamente se crean helpers:
+``` elixir
+alias YoWeb.Router.Helpers, as: Routes
+
+Routes.post_path(YoWeb.Endpoint, :index)
+
+Routes.post_path(YoWeb.Endpoint, :show, 1)
+
+Routes.post_path(YoWeb.Endpoint, :new)
+
+Routes.post_path(YoWeb.Endpoint, :create)
+
+Routes.post_path(YoWeb.Endpoint, :update, 2)
+
+Routes.post_path(YoWeb.Endpoint, :delete, 3)
+```
+
+En las vistas los podemos usar así:
+``` elixir
+<%= link "Posts", to: Routes.post_path(@conn, :index) %>
+```
+
 Se pueden nestear resources:
 ``` elixir
 resources "/posts", PostController do
