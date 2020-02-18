@@ -221,7 +221,7 @@ defmodule YoWeb.Plugs.Unauthorized do
     message = options[:message] || "No autorizado"
 
     conn
-    |> Plug.Conn.resp(401, message)
+    |> resp(401, message)
     |> halt()
   end
 end
