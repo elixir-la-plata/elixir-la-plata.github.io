@@ -3,17 +3,8 @@ layout: workshop
 title:  "Workshop 3: Frontend"
 workshop_date:   2020-02-21
 description: "Frontend, Plug, Endpoint, Routes, Controller, Views, Templates, Layouts."
-public: false
+public: true
 ---
-
-## Teoría
-* Procesos, receive, send, PID, self()
-* Tasks
-* Estado y Agent
-
-## Elixir Cards:
-* Kernel II y III
-* Agent
 
 ## Antes de empezar
 
