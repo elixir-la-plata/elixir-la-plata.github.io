@@ -230,11 +230,11 @@ Creamos nueva migración
 mix ecto.gen.migration add_comments
 ```
 
-Entramos al archivo nuevo y agregamos `body` y `post_id`:
+Entramos al archivo nuevo y agregamos `body` y `post_id` (Correjido):
 ``` elixir
 create table(:comments) do
   add :body, :string
-  add :post_id, references("posts"), on_delete: :delete_all
+  add :post_id, references("posts", on_delete: :delete_all)
 
   timestamps()
 end
@@ -481,7 +481,7 @@ Modificamos test:
 test "get_post!/1 returns the post with given id" do
   post = post_fixture()
   loaded_post = Blog.get_post!(post.id)
-      
+
   assert post.title == loaded_post.title
   assert post.body == loaded_post.body
   assert loaded_post.body == []

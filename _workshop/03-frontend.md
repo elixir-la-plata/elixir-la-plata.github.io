@@ -17,10 +17,16 @@ public: false
 
 ## Antes de empezar
 
-En `post.ex` faltó agregar el *on_delete*:
+En la migración de posts escribimos mal el *on_delete*. Pusimos:
 ```
-has_many :comments, Yo.Blog.Comment, on_delete: :delete_all
+add :post_id, references("posts"), on_delete: :delete_all
 ```
+
+Y debería ser:
+```
+add :post_id, references("posts", on_delete: :delete_all)
+```
+
 
 Vamos a cambiar los estilos. Clonar projecto:
 ```
