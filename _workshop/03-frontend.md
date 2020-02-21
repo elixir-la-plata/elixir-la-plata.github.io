@@ -106,13 +106,25 @@ self()
 
 ### Tareas:
 ``` elixir
+# Mejor returno al lanzarlo
+Task.start fn -> 1 + 1 end
+# Mejor reporte de errores
 Task.start fn -> raise "oops" end
 ```
 
 Async y await:
 ``` elixir
-task = task.async(fn -> 1 + 1 end)
-task = Task.await(task)
+# Lanza la tarea que puedo captar luego
+task = Task.async(fn -> 1 + 1 end)
+# Espero el resultado de la tarea
+Task.await(task)
+
+# Mejor ejemplo
+Task.async(fn -> :timer.sleep(4000); 1 + 5 end) |> Task.await
+
+task = Task.async(fn -> 1 + 5 end)
+Process.info(self(), :messages)
+Task.await(task)
 ```
 
 Estado con procesos:
@@ -136,9 +148,15 @@ end
 
 Podemos llamar al proceso:
 ``` elixir
+# Lanza el proceso
 {:ok, pid} = KV.start_link()
+# Envia el mensage put
 send(pid, {:put, :hello, :world})
+# Envia el mensaje get
 send(pid, {:get, :hello, self()})
+# Veo los mensajes
+Process.info(self, :messages)
+# Recibo todos los mensajes
 flush()
 ```
 
