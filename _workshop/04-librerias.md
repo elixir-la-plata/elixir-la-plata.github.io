@@ -1,7 +1,7 @@
 ---
 layout: workshop
 title:  "Workshop 4: Librerias"
-workshop_date:   2020-02-28
+workshop_date:   2020-03-06
 description: "Manejo de dependencias, Autenticación, terminando aplicación, releases."
 public: false
 ---
