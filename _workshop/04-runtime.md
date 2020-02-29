@@ -1,8 +1,8 @@
 ---
 layout: workshop
-title:  "Workshop 4: Librerias"
+title:  "Workshop 4: Runtime"
 workshop_date:   2020-03-06
-description: "Manejo de dependencias, Autenticación, terminando aplicación, releases."
+description: "Arboles de supervición, GenServers, Aplicaciones, Tolerancia a fallos, debugging."
 public: false
 ---
 
