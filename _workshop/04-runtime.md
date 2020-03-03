@@ -382,3 +382,14 @@ Phoenix tiene un excelente soporte para websockets.
 
 ## Nerves
 Herramienta para construir sistemas embebidos (Raspberries, etc.).
+
+## Programación distribuída
+Es uno de los puntos fuertes de Erlang y Elixir.
+Son problemas complejos. Elixir provee las abstracciones adecuadas.
+
+## Palabras finales
+La web está evolucionando. La web moderna es altamente conectada y necesita sistemas en tiempo real.
+Necesita incluir dispositivos conectados.
+Necesita sistemas de alta disponibilidad, escalables, tolerantes a fallos y distribuidos. Necesita sistemas que puedan aprovechar al máximo la capacidad de procesamiento de las computadoras.
+
+Erlang, Elixir y Phoenix fueron creados para resolver este tipo de problemas.
