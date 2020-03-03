@@ -6,7 +6,9 @@ description: "Arboles de supervición, GenServers, Aplicaciones, Tolerancia a fa
 public: false
 ---
 
-## Con las técnicas aprendidas creamos un contador simple
+## Repaso procesos
+
+Con las técnicas aprendidas creamos un contador simple
 ``` elixir
 defmodule Counter do
   def start_link do
@@ -28,7 +30,7 @@ end
 ```
 
 Y lo puedo llamar:
-```
+``` elixir
 {:ok, pid} = Counter.start_link()
 
 send(pid, {:get, self()})
@@ -108,7 +110,7 @@ end
 ```
 
 Y lo llamamos:
-```
+``` elixir
 {:ok, pid} = Counter.start_link()
 
 Counter.get(pid)
@@ -183,7 +185,7 @@ Supervisor.start_link(children, strategy: :one_for_one)
 ```
 
 Y luego comprobamos que el proceso Contador está corriendo:
-```
+``` elixir
 pid = Process.whereis(:counter)
 
 Counter.get(:counter)
@@ -192,7 +194,7 @@ Counter.get(:counter)
 ```
 
 Matamos al proceso, y comprobamos que el supervisor lo revivió en el estado original:
-```
+``` elixir
 Process.exit(pid, :kill)
 
 pid = Process.whereis(:counter)
@@ -233,13 +235,13 @@ children = [
 ```
 
 Corremos `iex -S mix` y lo probamos:
-```
+``` elixir
 Counter.get(:counter)
 Counter.inc(:counter)
 ```
 
 Agregamos en nuestro contexto `blog.ex`:
-```
+``` elixir
   alias Yo.Blog.Counter
 
   def get_counter() do
@@ -269,7 +271,7 @@ end
 ```
 
 Agregamos el plug en el pipeline `browser`, en `router.ex`:
-```
+``` elixir
 pipeline :browser do
   # ...
   plug YoWeb.Plugs.Count
@@ -283,57 +285,100 @@ Views: <%= @conn.assigns.counter %>
 
 Visitamos la página con `mix phx.server` y vemos los resultados.
 
-
-
-
-## Mover todo a Admin
-
-1. Creamos scope de admin y movemos rutas de post:
-```
-scope "/admin", YoWeb.Admin, as: :admin do
-  pipe_through :browser
-  resources "/posts", PostController
-end
-```
-
-2. Movemos `post_controller.ex` a `admin/post_controller.ex` y le cambiamos el nombre a `YoWeb.Admin.PostController`.
-
-3. Movemos `post_view.ex` a `admin/post_view.ex` y le cambiamos el nombre a `YoWeb.Admin.PostView`.
-
-4. Movemos carpeta `templates/post` a `templates/admin/post`
-
-5. Reemplazamos todas las instancias de `Router.post_path` por `Router.admin_post_path`.
-
-6. Nuevo Layout para Admin (otro color de fondo, o que diga admin, no sé.)
-
-
-## Crear parte pública de posts.
-1. Agregamos ruta pública para posts (index y show)
-2. Agregamos controller publico con index y show
-3. Agregamos vista publica
-4. Agregamos template de index
-5. Agregamos template de show
-
-## Agregar soporte de markdown
-1. Agregar dependencia y compilar.
-2. Modificar `show.html.eex` para mostrar markdown
-3. Bajamos seeds de url: (crear gist)
-4. Lo corremos
+---------
 
 ## Agregamos formulario de creacion de Comentarios.
 - Agregar formulario
 - Agregar ruta
 - Agregar controlador con create.
 - Mostrar como funciona.
-
-## Agregar contador de vistas publicas
-- Agregar contador que creamos hoy.
-- Agregarlo para que arranque con la aplicación.
-- Agregar plug para contar visitas.
-- Agregar plug a public post controller.
-- Mostrar cantidad de visitas en app layout.
+- Explicar protocolos
 
 ## Si hay tiempo, creamos aplicación Nueva
 ```
 mix new contador --sup
 ```
+
+-----------
+
+## Cosas que no dimos en el curso:
+
+### Streams
+Son enumerables Lazy que se pueden componer:
+``` elixir
+1..10000 |> Stream.map(&(&1 * &1)) |> Enum.take(10)
+```
+
+Útiles para trabajar con el concepto de infinito.
+También útiles para trabajar con archivos grandes sin ocupar toda la memoria:
+``` elixir
+"./my_file.txt"
+|> File.stream!
+|> Stream.map(&String.strip/1)
+|> Stream.with_index
+|> Stream.map(fn {line, i} -> "#{i}: #{line}" end)
+|> Enum.take(1)
+|> IO.inspect()
+```
+
+## With
+A veces no es siempre fácil escribir el código con Pipes.
+Para estos casos se puede usar `with`:
+```
+with {:ok, data} <- Reader.read(socket),
+     {:ok, command} <- Parser.parse(data),
+     do: Server.run(command)
+```
+## Typespecs
+Elixir es dinámico, así que no tiene chequeo de tipos en tiempo de compilación.
+Pueden agregar especificaciones de tipo con la anotación `spec`:
+```
+@spec round(number) :: integer
+def round(number) do
+  :erlang.round(number)
+end
+```
+Y una herramienta como Dialyzer va a usarlos para analizar el código.
+
+## Doctests
+Las anotaciones `@doc` se usan para documentar las funciones.
+Si se le agregan ejemplos con esta notación se pueden correr en los tests:
+```
+@doc ~S"""
+  Parses the given `line` into a command.
+
+  ## Examples
+
+      iex> KVServer.Command.parse("CREATE shopping\r\n")
+      {:ok, {:create, "shopping"}}
+
+"""
+def parse(_line) do
+  :not_implemented
+end
+```
+
+## Intercompatibilidad con Erlang
+Pueden usar librerías de Erlang desde Elixir.
+Los módulos de Erlang se escriben como átomos:
+```
+:ets.new(:a_name, [])
+
+:mnesia.create_schema([node()])
+
+:observer.start
+
+:queue.new
+
+:rand.uniform()
+```
+
+## Canales, Presence y Phoenix Live View
+Phoenix tiene un excelente soporte para websockets.
+
+* Con Canales podemos crear chats en tiempo real.
+* Con Presence podemos saber quien está conectado en tiempo real.
+* Con Phoenix Live View podemos crear aplicaciones super ricas sin escribir una sóla linea de javascript.
+
+## Nerves
+Herramienta para construir sistemas embebidos (Raspberries, etc.).
