@@ -3,7 +3,7 @@ layout: workshop
 title:  "Workshop 4: Runtime"
 workshop_date:   2020-03-06
 description: "Arboles de supervición, GenServers, Aplicaciones, Tolerancia a fallos, behaviours, protocols, formularios y debugging."
-public: false
+public: true
 ---
 
 ## Repaso procesos
