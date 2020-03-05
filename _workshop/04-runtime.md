@@ -288,11 +288,221 @@ Visitamos la página con `mix phx.server` y vemos los resultados.
 ---------
 
 ## Agregamos formulario de creacion de Comentarios.
-- Agregar formulario
-- Agregar ruta
-- Agregar controlador con create.
-- Mostrar como funciona.
-- Explicar protocolos
+
+### 1. Agregar la nueva ruta:
+
+`POST /post/:id/comments`
+
+```elixir
+    resources "/posts", PostController do
+      resources "/comments", CommentController, only: [:create]
+    end
+```
+
+
+### 2. Agregamos el formulario
+
+```html
+# lib/yo_web/templates/comment/form.html.eex
+<%= form_for @comment_changeset, @action, fn f -> %>
+  <%= if @comment_changeset.action do %>
+    <div class="alert alert-danger">
+      <p>Oops, something went wrong! Please check the errors below.</p>
+    </div>
+  <% end %>
+
+  <%= label f, :body %>
+  <%= text_input f, :body %>
+  <%= error_tag f, :body %>
+
+  <%= hidden_input f, :post_id, value: @post.id %>
+
+  <div>
+    <%= submit "Save" %>
+  </div>
+<% end %>
+```
+
+
+### 3. Modificar el template del post `show.html.eex` con el formulario nuevo y el
+listado
+
+```html
+<hr>
+<%= for comment <- @post.comments do %>
+  <p>
+    <div class=alert-info><%= comment.body %></div>
+  </p>
+<% end %>
+
+<h3> New comment <h3>
+<%= render YoWeb.CommentView, "form.html",
+  Map.put(assigns, :action, Routes.post_comment_path(@conn, :create, 1)) %>
+
+```
+
+
+### 4. Agregar el controlador `CommentController` con el método `create`
+
+```elixir
+defmodule YoWeb.CommentController do
+  use YoWeb, :controller
+
+  alias Yo.Blog
+  alias Yo.Blog.Post
+
+  def create(conn, %{"comment" => comment_params, "post_id" => post_id}) do
+    post = Blog.get_post!(post_id)
+
+    case Blog.create_comment(comment_params) do
+      {:ok, comment} ->
+        conn
+        |> put_flash(:info, "Comment created successfully.")
+        |> redirect(to: Routes.post_path(conn, :show, post_id))
+
+      {:error, %Ecto.Changeset{} = changeset} ->
+        render(conn, YoWeb.PostView, "show.html", post: post, comment_changeset: changeset)
+    end
+  end
+end
+```
+
+
+### 5. Implementamos los métodos necesarios en nuestra contexto
+
+```elixir
+ @doc """
+ Returns an `%Ecto.Changeset{}` for traking comment changes.
+
+ ## Examples
+
+ iex> change_comment(comment)
+ %Ecto.Changeset{source: %Comment{}}
+ """
+ def change_comment(%Comment{} = comment) do
+   Comment.changeset(comment, %{})
+ end
+ ```
+
+
+ ```elixir
+ @doc """
+ Creates a comment belongs_to a post.
+
+ ## Examples
+
+     iex> create_comment(%{field: value})
+     {:ok, %Post{}}
+
+     iex> create_comment(%{field: bad_value})
+     {:error, %Ecto.Changeset{}}
+
+ """
+ def create_comment(attrs \\ %{}) do
+   %Comment{}
+   |> Comment.changeset(attrs)
+   |> Repo.insert()
+ end
+```
+
+
+### 6. Creamos el Modulo `CommentView` para usar el render
+
+```elixir
+defmodule YoWeb.CommentView do
+  use YoWeb, :view
+end
+```
+
+## Protocols
+
+- Medio para lograr polimorfismo en Elixir
+- Los protocolos son especificamente para cuando quiere cambiar el
+comportamiento dependiendo del tipo de un dato
+
+
+### Ejemplo `String.Chars`
+
+```elixir
+iex> to_string(5)
+"5"
+iex> to_string(12.4)
+"12.4"
+iex> to_string("foo")
+"foo"
+```
+
+
+### Para una tupla?
+
+```elixir
+to_string({:foo})
+** (Protocol.UndefinedError) protocol String.Chars not implemented for {:foo}
+    (elixir) lib/string/chars.ex:3: String.Chars.impl_for!/1
+    (elixir) lib/string/chars.ex:17: String.Chars.to_string/1
+```
+
+
+### Implementemos para tupla
+
+
+```elixir
+defimpl String.Chars, for: Tuple do
+  def to_string(tuple) do
+    interior =
+      tuple
+      |> Tuple.to_list()
+      |> Enum.map(&Kernel.to_string/1)
+      |> Enum.join(", ")
+
+    "{#{interior}}"
+  end
+end
+```
+
+```elixir
+iex> to_string({3.14, "apple", :pie})
+"{3.14, apple, pie}"
+```
+
+
+### Implementemos un Protocolo
+
+```elixir
+defprotocol AsAtom do
+  def to_atom(data)
+end
+
+defimpl AsAtom, for: Atom do
+  def to_atom(atom), do: atom
+end
+
+defimpl AsAtom, for: BitString do
+  defdelegate to_atom(string), to: String
+end
+
+defimpl AsAtom, for: List do
+  defdelegate to_atom(list), to: List
+end
+
+defimpl AsAtom, for: Map do
+  def to_atom(map), do: List.first(Map.keys(map))
+end
+```
+
+
+```elixir
+iex> import AsAtom
+AsAtom
+iex> to_atom("string")
+:string
+iex> to_atom(:an_atom)
+:an_atom
+iex> to_atom([1, 2])
+:"\x01\x02"
+iex> to_atom(%{foo: "bar"})
+:foo
+```
 
 ## Si hay tiempo, creamos aplicación Nueva
 ```
